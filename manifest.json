@@ -68,7 +68,7 @@
       "title": "Host",
       "description": "TiDB host address",
       "required": true,
-      "default": "gateway01.us-west-2.prod.aws.tidbcloud.com"
+      "default": "gateway01.ap-northeast-1.prod.aws.tidbcloud.com"
     },
     "port": {
       "type": "number",

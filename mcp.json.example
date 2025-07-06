@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "tidb-cloud-serverless": {
+      "command": "node",
+      "args": ["dist/server.js"],
+      "cwd": ".",
+      "env": {
+        "TIDB_HOST": "gateway01.us-west-2.prod.aws.tidbcloud.com",
+        "TIDB_PORT": "4000",
+        "TIDB_USERNAME": "your_username",
+        "TIDB_PASSWORD": "your_password",
+        "TIDB_DATABASE": "test"
+      }
+    }
+  }
+}

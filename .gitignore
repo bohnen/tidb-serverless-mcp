@@ -3,4 +3,5 @@ dist/
 .env
 .env.local
 *.log
+*.dxt
 .DS_Store
