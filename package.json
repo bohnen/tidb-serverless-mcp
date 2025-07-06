@@ -1,0 +1,31 @@
+{
+  "name": "dxt-tidb",
+  "version": "1.0.0",
+  "description": "DXT extension for TiDB Cloud Serverless - MCP server for database operations",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/server.js",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "tidb",
+    "mcp",
+    "dxt",
+    "database",
+    "serverless"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.7.0",
+    "@tidbcloud/serverless": "^0.2.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2"
+  }
+}

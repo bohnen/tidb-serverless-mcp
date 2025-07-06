@@ -1,0 +1,116 @@
+{
+  "dxt_version": "0.1",
+  "name": "tidb-cloud-serverless",
+  "version": "1.0.0",
+  "display_name": "TiDB Cloud Serverless",
+  "description": "MCP server for TiDB Cloud Serverless database operations",
+  "long_description": "This extension provides a Model Context Protocol (MCP) server that enables AI assistants to interact with TiDB Cloud Serverless databases. It offers tools for database management, querying, and executing SQL statements with full support for TiDB's features including vector search.\n\n## Features\n- Database and table management\n- SQL query execution with parameter binding\n- Transaction support\n- User management\n- Vector search capabilities\n- Secure credential handling\n\n## Configuration\nThe extension can be configured using environment variables or user configuration options.",
+  "author": {
+    "name": "TiDB Extension Developer",
+    "email": "developer@example.com"
+  },
+  "repository": "https://github.com/yourusername/dxt-tidb",
+  "homepage": "https://github.com/yourusername/dxt-tidb",
+  "documentation": "https://github.com/yourusername/dxt-tidb/blob/main/README.md",
+  "keywords": ["tidb", "database", "sql", "serverless", "vector", "mcp"],
+  "categories": ["database", "development"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/server.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "TIDB_DATABASE_URL": "${user_config.database_url}",
+        "TIDB_HOST": "${user_config.host}",
+        "TIDB_PORT": "${user_config.port}",
+        "TIDB_USERNAME": "${user_config.username}",
+        "TIDB_PASSWORD": "${user_config.password}",
+        "TIDB_DATABASE": "${user_config.database}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "show_databases",
+      "description": "Show all databases in the TiDB cluster"
+    },
+    {
+      "name": "switch_database",
+      "description": "Switch to a specific database with optional credentials"
+    },
+    {
+      "name": "show_tables",
+      "description": "Show all tables in the current database"
+    },
+    {
+      "name": "db_query",
+      "description": "Execute SELECT queries on the TiDB database"
+    },
+    {
+      "name": "db_execute",
+      "description": "Execute INSERT, UPDATE, DELETE, CREATE, DROP operations"
+    },
+    {
+      "name": "db_create_user",
+      "description": "Create a new database user"
+    },
+    {
+      "name": "db_remove_user",
+      "description": "Remove a database user"
+    }
+  ],
+  "user_config": [
+    {
+      "name": "database_url",
+      "description": "Full TiDB connection URL (mysql://username:password@host:port/database)",
+      "type": "string",
+      "required": false,
+      "secure": true
+    },
+    {
+      "name": "host",
+      "description": "TiDB host address",
+      "type": "string",
+      "required": false,
+      "default": "gateway01.us-west-2.prod.aws.tidbcloud.com"
+    },
+    {
+      "name": "port",
+      "description": "TiDB port number",
+      "type": "number",
+      "required": false,
+      "default": 4000
+    },
+    {
+      "name": "username",
+      "description": "TiDB username",
+      "type": "string",
+      "required": false
+    },
+    {
+      "name": "password",
+      "description": "TiDB password",
+      "type": "string",
+      "required": false,
+      "secure": true
+    },
+    {
+      "name": "database",
+      "description": "Default database name",
+      "type": "string",
+      "required": false,
+      "default": "test"
+    }
+  ],
+  "compatibility": {
+    "platforms": ["windows", "macos", "linux"],
+    "architectures": ["x64", "arm64"],
+    "node_version": ">=18.0.0"
+  },
+  "permissions": {
+    "network": true,
+    "environment_variables": true
+  }
+}
