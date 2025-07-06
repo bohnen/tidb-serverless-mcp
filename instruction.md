@@ -12,7 +12,7 @@ I want to build MCP (Model Context Protocol) which access TiDB Cloud Serverless 
    - https://github.com/anthropics/dxt/blob/main/MANIFEST.md - Complete extension manifest structure and field definitions
    - https://github.com/anthropics/dxt/tree/main/examples - Reference implementations including a "Hello World" example
    - https://github.com/tidbcloud/serverless-js/blob/main/README.md - TiDB Cloud Serverless JS SDK documentation for installation and usage
-   - server.py - Example MCP server implementation for TiDB Cloud Serverless. This will help you understand how to implement the MCP server and tool definitions. 
+   - https://github.com/pingcap/pytidb/blob/main/pytidb/ext/mcp/server.py - Example MCP server implementation for TiDB Cloud Serverless. This will help you understand how to implement the MCP server and tool definitions. 
 
 2. **Create a proper extension structure:**
    - Generate a valid manifest.json following the MANIFEST.md spec

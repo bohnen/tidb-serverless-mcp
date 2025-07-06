@@ -6,12 +6,15 @@
   "description": "MCP server for TiDB Cloud Serverless database operations",
   "long_description": "This extension provides a Model Context Protocol (MCP) server that enables AI assistants to interact with TiDB Cloud Serverless databases. It offers tools for database management, querying, and executing SQL statements with full support for TiDB's features including vector search.\n\n## Features\n- Database and table management\n- SQL query execution with parameter binding\n- Transaction support\n- User management\n- Vector search capabilities\n- Secure credential handling\n\n## Configuration\nThe extension can be configured using environment variables or user configuration options.",
   "author": {
-    "name": "TiDB Extension Developer",
-    "email": "developer@example.com"
+    "name": "bohnen",
+    "email": "bohnen.net@gmail.com"
   },
-  "repository": "https://github.com/yourusername/dxt-tidb",
-  "homepage": "https://github.com/yourusername/dxt-tidb",
-  "documentation": "https://github.com/yourusername/dxt-tidb/blob/main/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bohnen/tidb-serverless-mcp"
+  },
+  "homepage": "https://github.com/bohnen/tidb-serverless-mcp",
+  "documentation": "https://github.com/bohnen/tidb-serverless-mcp/README.md",
   "keywords": ["tidb", "database", "sql", "serverless", "vector", "mcp"],
   "categories": ["database", "development"],
   "server": {
@@ -21,8 +24,6 @@
       "command": "node",
       "args": ["${__dirname}/dist/server.js"],
       "env": {
-        "NODE_ENV": "production",
-        "TIDB_DATABASE_URL": "${user_config.database_url}",
         "TIDB_HOST": "${user_config.host}",
         "TIDB_PORT": "${user_config.port}",
         "TIDB_USERNAME": "${user_config.username}",
@@ -61,51 +62,44 @@
       "description": "Remove a database user"
     }
   ],
-  "user_config": [
-    {
-      "name": "database_url",
-      "description": "Full TiDB connection URL (mysql://username:password@host:port/database)",
+  "user_config": {
+    "host": {
       "type": "string",
-      "required": false,
-      "secure": true
-    },
-    {
-      "name": "host",
+      "title": "Host",
       "description": "TiDB host address",
-      "type": "string",
-      "required": false,
+      "required": true,
       "default": "gateway01.us-west-2.prod.aws.tidbcloud.com"
     },
-    {
-      "name": "port",
-      "description": "TiDB port number",
+    "port": {
       "type": "number",
-      "required": false,
+      "title": "Port",
+      "description": "TiDB port number",
+      "required": true,
       "default": 4000
     },
-    {
-      "name": "username",
+    "username": {
+      "type": "string",
+      "title": "Username",
       "description": "TiDB username",
-      "type": "string",
-      "required": false
+      "required": true
     },
-    {
-      "name": "password",
+    "password": {
+      "type": "string",
+      "title": "Password",
       "description": "TiDB password",
-      "type": "string",
-      "required": false,
-      "secure": true
+      "sensitive": true,
+      "required": true
     },
-    {
-      "name": "database",
-      "description": "Default database name",
+    "database": {
       "type": "string",
+      "title": "Database",
+      "description": "Default database name",
       "required": false,
       "default": "test"
     }
-  ],
+  },
   "compatibility": {
-    "platforms": ["windows", "macos", "linux"],
+    "platforms": ["win32", "darwin", "linux"],
     "architectures": ["x64", "arm64"],
     "node_version": ">=18.0.0"
   },
