@@ -48,7 +48,6 @@ TIDB_DATABASE=test
 
 When installing the extension, you can configure the following options:
 
-- `database_url`: Full TiDB connection URL (takes precedence over individual parameters)
 - `host`: TiDB host address (default: gateway01.us-west-2.prod.aws.tidbcloud.com)
 - `port`: TiDB port number (default: 4000)
 - `username`: TiDB username

@@ -1,14 +1,15 @@
 {
   "dxt_version": "0.1",
   "name": "tidb-cloud-serverless",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "display_name": "TiDB Cloud Serverless",
-  "description": "MCP server for TiDB Cloud Serverless database operations",
+  "description": "Unofficial MCP server for TiDB Cloud Serverless database operations",
   "long_description": "This extension provides a Model Context Protocol (MCP) server that enables AI assistants to interact with TiDB Cloud Serverless databases. It offers tools for database management, querying, and executing SQL statements with full support for TiDB's features including vector search.\n\n## Features\n- Database and table management\n- SQL query execution with parameter binding\n- Transaction support\n- User management\n- Vector search capabilities\n- Secure credential handling\n\n## Configuration\nThe extension can be configured using environment variables or user configuration options.",
   "author": {
     "name": "bohnen",
     "email": "bohnen.net@gmail.com"
   },
+  "icon": "tidb-logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/bohnen/tidb-serverless-mcp"
