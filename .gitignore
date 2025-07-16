@@ -5,3 +5,4 @@ dist/
 *.log
 *.dxt
 .DS_Store
+.claude/

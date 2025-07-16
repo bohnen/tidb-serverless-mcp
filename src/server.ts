@@ -6,126 +6,10 @@ import {
   ErrorCode,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
-import { connect, Connection } from "@tidbcloud/serverless";
 import * as dotenv from "dotenv";
+import { TiDBConnector, TiDBConfig } from "./connector.js";
 
 dotenv.config();
-
-interface TiDBConfig {
-  databaseUrl?: string;
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-  database?: string;
-}
-
-class TiDBConnector {
-  private connection: Connection;
-  private config: TiDBConfig;
-
-  constructor(config: TiDBConfig) {
-    this.config = config;
-    this.connection = this.createConnection(config);
-  }
-
-  private createConnection(config: TiDBConfig): Connection {
-    if (config.databaseUrl) {
-      return connect({ url: config.databaseUrl });
-    }
-
-    const { host, port, username, password, database } = config;
-    const url = `mysql://${username}:${password}@${host}:${port}/${database}`;
-    return connect({ url });
-  }
-
-  async showDatabases(): Promise<any[]> {
-    const result = await this.connection.execute("SHOW DATABASES");
-    return Array.isArray(result) ? result : result.rows || [];
-  }
-
-  async switchDatabase(dbName: string, username?: string, password?: string): Promise<void> {
-    const newConfig = {
-      ...this.config,
-      database: dbName,
-      username: username || this.config.username,
-      password: password || this.config.password,
-    };
-    this.connection = this.createConnection(newConfig);
-    this.config = newConfig;
-  }
-
-  async showTables(): Promise<string[]> {
-    const result = await this.connection.execute("SHOW TABLES");
-    const rows = Array.isArray(result) ? result : result.rows || [];
-    return rows.map((row: any) => Object.values(row)[0] as string);
-  }
-
-  async query(sqlStmt: string): Promise<any[]> {
-    const result = await this.connection.execute(sqlStmt);
-    return Array.isArray(result) ? result : result.rows || [];
-  }
-
-  async execute(sqlStmts: string | string[]): Promise<any[]> {
-    const results: any[] = [];
-    const statements = Array.isArray(sqlStmts) ? sqlStmts : [sqlStmts];
-
-    const tx = await this.connection.begin();
-    try {
-      for (const stmt of statements) {
-        const result = await tx.execute(stmt);
-        const fullResult = Array.isArray(result) ? { rowsAffected: 0, lastInsertId: null } : result;
-        results.push({
-          statement: stmt,
-          affectedRows: fullResult.rowsAffected || 0,
-          lastInsertId: fullResult.lastInsertId || null,
-        });
-      }
-      await tx.commit();
-    } catch (error) {
-      await tx.rollback();
-      throw error;
-    }
-
-    return results;
-  }
-
-  get isServerless(): boolean {
-    const host = this.config.host || "";
-    return host.includes("tidbcloud.com");
-  }
-
-  async currentUsername(): Promise<string> {
-    const result = await this.connection.execute("SELECT CURRENT_USER()");
-    const rows = Array.isArray(result) ? result : result.rows || [];
-    return Object.values(rows[0])[0] as string;
-  }
-
-  async createUser(username: string, password: string): Promise<string> {
-    let fullUsername = username;
-    
-    if (this.isServerless && !username.includes(".")) {
-      const currentUser = await this.currentUsername();
-      const prefix = currentUser.split(".")[0];
-      fullUsername = `${prefix}.${username}`;
-    }
-
-    await this.connection.execute(`CREATE USER '${fullUsername}' IDENTIFIED BY '${password}'`);
-    return fullUsername;
-  }
-
-  async removeUser(username: string): Promise<void> {
-    let fullUsername = username;
-    
-    if (this.isServerless && !username.includes(".")) {
-      const currentUser = await this.currentUsername();
-      const prefix = currentUser.split(".")[0];
-      fullUsername = `${prefix}.${username}`;
-    }
-
-    await this.connection.execute(`DROP USER '${fullUsername}'`);
-  }
-}
 
 let tidbConnector: TiDBConnector | null = null;
 
@@ -386,6 +270,15 @@ async function main() {
     process.exit(1);
   }
 }
+
+// Graceful shutdown
+process.on("SIGINT", async () => {
+  console.error("Shutting down...");
+  if (tidbConnector) {
+    await tidbConnector.close();
+  }
+  process.exit(0);
+});
 
 main().catch((error) => {
   console.error("Fatal error:", error);

@@ -8,7 +8,11 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/server.js",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "npx tsx test/basic-operations.test.ts && npx tsx test/connector.test.ts && npx tsx test/server-integration.test.ts",
+    "test:basic": "npx tsx test/basic-operations.test.ts",
+    "test:connector": "npx tsx test/connector.test.ts",
+    "test:server": "npx tsx test/server-integration.test.ts"
   },
   "keywords": [
     "tidb",
@@ -21,11 +25,12 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.7.0",
-    "@tidbcloud/serverless": "^0.2.0",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.11.5"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
+    "tsx": "^4.20.3",
     "typescript": "^5.7.2"
   }
 }

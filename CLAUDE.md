@@ -34,6 +34,14 @@ npm run clean
 
 # Install dependencies
 npm install
+
+# Run all tests
+npm test
+
+# Run individual tests
+npm run test:basic      # Basic operations test
+npm run test:connector  # Connector class test
+npm run test:server     # MCP server integration test
 ```
 
 ## Configuration
@@ -62,17 +70,33 @@ Defined in manifest.json under `user_config`: host, port, username, password (se
 
 ## Testing
 
-1. Build the extension: `npm run build`
-2. Set up `.env` file with valid TiDB credentials
-3. Run: `npm start`
-4. Test via stdio transport communication
+The project includes comprehensive TypeScript tests following t-wada's "No API is the best API" philosophy:
+
+1. **Setup**: Create `.env` file with TiDB Cloud credentials
+2. **Build**: Run `npm run build` to compile TypeScript
+3. **Test**: Execute `npm test` to run all tests
+
+### Test Coverage
+- **Basic Operations**: Connection, CRUD operations, transactions
+- **Connector Class**: All public methods, error handling, TiDB Serverless features
+- **MCP Integration**: All 7 database tools, response format validation
+- **Type Safety**: TypeScript type definitions and compile-time checks
+
+### Test Files
+- `test/basic-operations.test.ts`: Core database functionality
+- `test/connector.test.ts`: TiDBConnector class methods
+- `test/server-integration.test.ts`: MCP server tools
+- `test/setup.ts`: Test utilities and helpers
+
+See `test/README.md` for detailed test documentation.
 
 ## Dependencies
 
 - **@modelcontextprotocol/sdk**: MCP protocol implementation
-- **@tidbcloud/serverless**: TiDB Cloud Serverless JS SDK
+- **mysql2**: MySQL/TiDB connection driver with Promise support
 - **dotenv**: Environment variable management
 - **TypeScript**: Development and compilation
+- **tsx**: TypeScript execution tool for tests
 
 ## Vector Search Support
 
