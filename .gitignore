@@ -6,3 +6,5 @@ dist/
 *.dxt
 .DS_Store
 .claude/
+.mcp.json
+
