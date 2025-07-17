@@ -32,7 +32,7 @@ describe("TiDBConnector Tests", () => {
 
   // Setup: Initialize test data
   testTableName = `test_table_${Date.now()}`;
-  testUsername = `test_user_${Date.now()}`;
+  testUsername = `tu_${Date.now().toString().slice(-8)}`; // Keep under 32 chars
 
   describe("Connection Tests", () => {
     itAsync("should connect to TiDB Cloud successfully", async () => {
@@ -247,18 +247,13 @@ describe("TiDBConnector Tests", () => {
       const connector = new TiDBConnector(config);
       try {
         if (connector.isServerless) {
-          try {
-            const fullUsername = await connector.createUser(testUsername, "testpass123");
-            const currentUser = await connector.currentUsername();
-            const expectedPrefix = currentUser.split(".")[0];
-            assert(fullUsername.startsWith(expectedPrefix + "."));
+          const fullUsername = await connector.createUser(testUsername, "testpass123");
+          const currentUser = await connector.currentUsername();
+          const expectedPrefix = currentUser.split(".")[0];
+          assert(fullUsername.startsWith(expectedPrefix + "."));
 
-            // Clean up
-            await connector.removeUser(testUsername);
-          } catch (error) {
-            // User creation might fail due to permissions
-            console.log(`      (Skipped: ${error instanceof Error ? error.message : String(error)})`);
-          }
+          // Clean up
+          await connector.removeUser(testUsername);
         } else {
           console.log("      (Skipping: not a serverless instance)");
         }

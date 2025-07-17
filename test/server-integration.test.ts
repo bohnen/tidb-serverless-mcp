@@ -215,22 +215,18 @@ async function runServerIntegrationTest(): Promise<void> {
     assert(verifyData.length === 2);
     console.log('✓ Transaction results verified');
     
-    // Test 8: User management (if permissions allow)
+    // Test 8: User management
     console.log('## Test 8: User management');
-    const testUsername = `test_user_${Date.now()}`;
-    try {
-      const createUserResult = await server.dbCreateUser(testUsername, 'testpass123');
-      assert(createUserResult.content);
-      assert(createUserResult.content[0].text.includes('User created successfully'));
-      console.log('✓ User created via db_create_user');
-      
-      const removeUserResult = await server.dbRemoveUser(testUsername);
-      assert(removeUserResult.content);
-      assert(removeUserResult.content[0].text.includes('User removed successfully'));
-      console.log('✓ User removed via db_remove_user');
-    } catch (error) {
-      console.log(`  (Skipped: ${error instanceof Error ? error.message : String(error)})`);
-    }
+    const testUsername = `tu_${Date.now().toString().slice(-8)}`; // Keep under 32 chars
+    const createUserResult = await server.dbCreateUser(testUsername, 'testpass123');
+    assert(createUserResult.content);
+    assert(createUserResult.content[0].text.includes('User created successfully'));
+    console.log('✓ User created via db_create_user');
+    
+    const removeUserResult = await server.dbRemoveUser(testUsername);
+    assert(removeUserResult.content);
+    assert(removeUserResult.content[0].text.includes('User removed successfully'));
+    console.log('✓ User removed via db_remove_user');
     
     // Test 9: Cleanup
     console.log('## Test 9: Cleanup');
