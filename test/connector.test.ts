@@ -10,6 +10,8 @@ const config: TiDBConfig = {
   username: process.env.TIDB_USERNAME!,
   password: process.env.TIDB_PASSWORD!,
   database: process.env.TIDB_DATABASE!,
+  tls: process.env.TIDB_TLS === 'true',
+  tlsCaPath: process.env.TIDB_TLS_CA_CERT_PATH || undefined,
 };
 
 interface DatabaseRow {

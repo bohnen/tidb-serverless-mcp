@@ -29,7 +29,9 @@
         "TIDB_PORT": "${user_config.port}",
         "TIDB_USERNAME": "${user_config.username}",
         "TIDB_PASSWORD": "${user_config.password}",
-        "TIDB_DATABASE": "${user_config.database}"
+        "TIDB_DATABASE": "${user_config.database}",
+        "TIDB_TLS": "${user_config.tls}",
+        "TIDB_TLS_CA_CERT_PATH": "${user_config.tlsCaPath}"
       }
     }
   },
@@ -97,6 +99,19 @@
       "description": "Default database name",
       "required": false,
       "default": "test"
+    },
+    "tls": {
+      "type": "boolean",
+      "title": "Enable TLS",
+      "description": "Enable TLS/SSL connection to TiDB",
+      "required": false,
+      "default": true
+    },
+    "tlsCaPath": {
+      "type": "string",
+      "title": "TLS CA Certificate Path",
+      "description": "Path to custom CA certificate file for TLS connection",
+      "required": false
     }
   },
   "compatibility": {

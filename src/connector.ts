@@ -7,6 +7,8 @@ export interface TiDBConfig {
   username?: string;
   password?: string;
   database?: string;
+  tls?: boolean;
+  tlsCaPath?: string;
 }
 
 export class TiDBConnector {
@@ -19,6 +21,24 @@ export class TiDBConnector {
   }
 
   private createPool(config: TiDBConfig): mysql.Pool {
+    const getSslConfig = () => {
+      if (config.tls === false) {
+        return false;
+      }
+      
+      const sslConfig: any = {
+        minVersion: 'TLSv1.2',
+        rejectUnauthorized: true,
+      };
+      
+      if (config.tlsCaPath) {
+        const fs = require('fs');
+        sslConfig.ca = fs.readFileSync(config.tlsCaPath);
+      }
+      
+      return sslConfig;
+    };
+
     if (config.databaseUrl) {
       return mysql.createPool({
         uri: config.databaseUrl,
@@ -27,10 +47,7 @@ export class TiDBConnector {
         queueLimit: 0,
         enableKeepAlive: true,
         keepAliveInitialDelay: 0,
-        ssl: {
-          minVersion: 'TLSv1.2',
-          rejectUnauthorized: true,
-        },
+        ssl: getSslConfig(),
         connectTimeout: 30000,
       });
     }
@@ -47,10 +64,7 @@ export class TiDBConnector {
       queueLimit: 0,
       enableKeepAlive: true,
       keepAliveInitialDelay: 0,
-      ssl: {
-        minVersion: 'TLSv1.2',
-        rejectUnauthorized: true,
-      },
+      ssl: getSslConfig(),
       connectTimeout: 30000,
     });
   }

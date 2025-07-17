@@ -6,13 +6,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "build:test": "tsc --project tsconfig.test.json",
     "dev": "tsc --watch",
     "start": "node dist/server.js",
     "clean": "rm -rf dist",
-    "test": "npx tsx test/basic-operations.test.ts && npx tsx test/connector.test.ts && npx tsx test/server-integration.test.ts",
-    "test:basic": "npx tsx test/basic-operations.test.ts",
-    "test:connector": "npx tsx test/connector.test.ts",
-    "test:server": "npx tsx test/server-integration.test.ts"
+    "test": "npm run build:test && node dist/test/basic-operations.test.js && node dist/test/connector.test.js && node dist/test/server-integration.test.js",
+    "test:basic": "npm run build:test && node dist/test/basic-operations.test.js",
+    "test:connector": "npm run build:test && node dist/test/connector.test.js",
+    "test:server": "npm run build:test && node dist/test/server-integration.test.js"
   },
   "keywords": [
     "tidb",

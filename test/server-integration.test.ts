@@ -12,7 +12,9 @@ const config: TiDBConfig = {
   port: parseInt(process.env.TIDB_PORT || '4000'),
   username: process.env.TIDB_USERNAME!,
   password: process.env.TIDB_PASSWORD!,
-  database: process.env.TIDB_DATABASE || 'test'
+  database: process.env.TIDB_DATABASE || 'test',
+  tls: process.env.TIDB_TLS === 'true',
+  tlsCaPath: process.env.TIDB_TLS_CA_CERT_PATH || undefined,
 };
 
 interface MCPContent {

@@ -257,6 +257,8 @@ async function main() {
       username: process.env.TIDB_USERNAME || "root",
       password: process.env.TIDB_PASSWORD || "",
       database: process.env.TIDB_DATABASE || "test",
+      tls: process.env.TIDB_TLS ? process.env.TIDB_TLS.toLowerCase() === "true" : true,
+      tlsCaPath: process.env.TIDB_TLS_CA_CERT_PATH || undefined,
     };
 
     tidbConnector = new TiDBConnector(config);
