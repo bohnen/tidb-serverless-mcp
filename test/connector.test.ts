@@ -1,5 +1,5 @@
 import assert from "assert";
-import { describe, it, itAsync, checkEnvVariables } from "./setup.js";
+import { describeAsync, it, itAsync, checkEnvVariables } from "./setup.js";
 import { TiDBConnector, TiDBConfig } from "../src/connector.js";
 
 checkEnvVariables();
@@ -28,7 +28,9 @@ interface TestResult {
   result: number;
 }
 
-describe("TiDBConnector Tests", () => {
+// Main test runner
+async function runConnectorTests() {
+  await describeAsync("TiDBConnector Tests", async () => {
   let testTableName: string;
   let testUsername: string;
 
@@ -36,7 +38,7 @@ describe("TiDBConnector Tests", () => {
   testTableName = `test_table_${Date.now()}`;
   testUsername = `tu_${Date.now().toString().slice(-8)}`; // Keep under 32 chars
 
-  describe("Connection Tests", () => {
+  await describeAsync("Connection Tests", async () => {
     itAsync("should connect to TiDB Cloud successfully", async () => {
       const connector = new TiDBConnector(config);
       try {
@@ -62,7 +64,7 @@ describe("TiDBConnector Tests", () => {
     });
   });
 
-  describe("Database Operations", () => {
+  await describeAsync("Database Operations", async () => {
     itAsync("should show databases", async () => {
       const connector = new TiDBConnector(config);
       try {
@@ -100,7 +102,7 @@ describe("TiDBConnector Tests", () => {
     });
   });
 
-  describe("Table Operations", () => {
+  await describeAsync("Table Operations", async () => {
     itAsync("should perform CRUD operations", async () => {
       const connector = new TiDBConnector(config);
       try {
@@ -153,7 +155,7 @@ describe("TiDBConnector Tests", () => {
     });
   });
 
-  describe("Transaction Tests", () => {
+  await describeAsync("Transaction Tests", async () => {
     itAsync("should handle multiple statements in transaction", async () => {
       const connector = new TiDBConnector(config);
       try {
@@ -228,7 +230,7 @@ describe("TiDBConnector Tests", () => {
     });
   });
 
-  describe("User Management Tests (TiDB Serverless)", () => {
+  await describeAsync("User Management Tests (TiDB Serverless)", async () => {
     itAsync("should handle TiDB Serverless user prefix", async () => {
       const connector = new TiDBConnector(config);
       try {
@@ -265,7 +267,7 @@ describe("TiDBConnector Tests", () => {
     });
   });
 
-  describe("Database Switching", () => {
+  await describeAsync("Database Switching", async () => {
     itAsync("should switch database", async () => {
       const connector = new TiDBConnector(config);
       
@@ -293,4 +295,11 @@ describe("TiDBConnector Tests", () => {
     });
   });
 
+  });
+}
+
+// Run the tests
+runConnectorTests().catch(error => {
+  console.error("Test execution failed:", error);
+  process.exit(1);
 });

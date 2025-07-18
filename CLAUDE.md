@@ -49,6 +49,7 @@ npm run test:server     # MCP server integration test
 The extension supports both environment variables and DXT user configuration:
 
 ### Environment Variables (.env file)
+
 ```env
 TIDB_HOST=gateway01.us-west-2.prod.aws.tidbcloud.com
 TIDB_PORT=4000
@@ -58,6 +59,7 @@ TIDB_DATABASE=test
 ```
 
 ### DXT User Configuration
+
 Defined in manifest.json under `user_config`: host, port, username, password (sensitive), database. The manifest automatically injects these as environment variables when the extension runs.
 
 ## Key Implementation Details
@@ -70,19 +72,21 @@ Defined in manifest.json under `user_config`: host, port, username, password (se
 
 ## Testing
 
-The project includes comprehensive TypeScript tests following t-wada's "No API is the best API" philosophy:
+The project includes comprehensive TypeScript tests following philosophy:
 
 1. **Setup**: Create `.env` file with TiDB Cloud credentials
 2. **Build**: Run `npm run build` to compile TypeScript
 3. **Test**: Execute `npm test` to run all tests
 
 ### Test Coverage
+
 - **Basic Operations**: Connection, CRUD operations, transactions
 - **Connector Class**: All public methods, error handling, TiDB Serverless features
 - **MCP Integration**: All 7 database tools, response format validation
 - **Type Safety**: TypeScript type definitions and compile-time checks
 
 ### Test Files
+
 - `test/basic-operations.test.ts`: Core database functionality
 - `test/connector.test.ts`: TiDBConnector class methods
 - `test/server-integration.test.ts`: MCP server tools

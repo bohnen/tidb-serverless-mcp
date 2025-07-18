@@ -1,18 +1,15 @@
-// Basic operations test for TiDB Cloud connection (TypeScript version)
-import { TiDBConnector, TiDBConfig } from '../src/connector.js';
-import assert from 'assert';
-import dotenv from 'dotenv';
+import assert from "assert";
+import { describeAsync, itAsync, checkEnvVariables } from "./setup.js";
+import { TiDBConnector, TiDBConfig } from "../src/connector.js";
 
-// Load environment variables
-dotenv.config();
+checkEnvVariables();
 
-// Test configuration
 const config: TiDBConfig = {
   host: process.env.TIDB_HOST!,
-  port: parseInt(process.env.TIDB_PORT || '4000'),
+  port: parseInt(process.env.TIDB_PORT || "4000"),
   username: process.env.TIDB_USERNAME!,
   password: process.env.TIDB_PASSWORD!,
-  database: process.env.TIDB_DATABASE || 'test',
+  database: process.env.TIDB_DATABASE || "test",
   tls: process.env.TIDB_TLS === 'true',
   tlsCaPath: process.env.TIDB_TLS_CA_CERT_PATH || undefined
 };
@@ -31,106 +28,101 @@ interface TableRow {
   created_at: Date;
 }
 
-async function runBasicOperationsTest(): Promise<void> {
-  console.log('# Basic Operations Test (TypeScript)');
-  
-  const connector = new TiDBConnector(config);
-  const testTableName = `test_table_${Date.now()}`;
-  
-  try {
-    // Test 1: Connection and basic query
-    console.log('## Test 1: Connection and basic query');
-    const result = await connector.query('SELECT 1 as result') as TestResult[];
-    assert.strictEqual(result[0].result, 1);
-    console.log('✓ Connection successful');
+// Main test runner
+async function runBasicOperationsTests() {
+  await describeAsync("Basic Operations Tests", async () => {
+    let testTableName: string;
+    let connector: TiDBConnector;
     
-    // Test 2: Show databases
-    console.log('## Test 2: Show databases');
-    const databases = await connector.showDatabases() as DatabaseRow[];
-    assert(Array.isArray(databases));
-    assert(databases.length > 0);
-    console.log(`✓ Found ${databases.length} databases`);
+    // Setup
+    testTableName = `test_table_${Date.now()}`;
+    connector = new TiDBConnector(config);
     
-    // Test 3: Show tables
-    console.log('## Test 3: Show tables');
-    const tables = await connector.showTables();
-    assert(Array.isArray(tables));
-    console.log(`✓ Found ${tables.length} tables`);
+    itAsync("should connect and execute basic query", async () => {
+      try {
+        const result = await connector.query("SELECT 1 as result") as TestResult[];
+        assert.strictEqual(result[0].result, 1);
+      } finally {
+        // Keep connection open for other tests
+      }
+    });
     
-    // Test 4: Get current user
-    console.log('## Test 4: Get current user');
-    const currentUser = await connector.currentUsername();
-    assert(typeof currentUser === 'string');
-    console.log(`✓ Current user: ${currentUser}`);
+    itAsync("should show databases", async () => {
+      const databases = await connector.showDatabases() as DatabaseRow[];
+      assert(Array.isArray(databases));
+      assert(databases.length > 0);
+    });
     
-    // Test 5: Create table
-    console.log('## Test 5: Create table');
-    const createTableSQL = `
-      CREATE TABLE IF NOT EXISTS ${testTableName} (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-    const createResult = await connector.execute(createTableSQL);
-    assert(Array.isArray(createResult));
-    console.log('✓ Table created successfully');
+    itAsync("should show tables", async () => {
+      const tables = await connector.showTables();
+      assert(Array.isArray(tables));
+    });
     
-    // Test 6: Insert data
-    console.log('## Test 6: Insert data');
-    const insertResult = await connector.execute(
-      `INSERT INTO ${testTableName} (name) VALUES ('test_data')`
-    );
-    assert.strictEqual(insertResult[0].affectedRows, 1);
-    console.log('✓ Data inserted successfully');
+    itAsync("should get current user", async () => {
+      const currentUser = await connector.currentUsername();
+      assert(typeof currentUser === "string");
+    });
     
-    // Test 7: Query data
-    console.log('## Test 7: Query data');
-    const queryResult = await connector.query(
-      `SELECT * FROM ${testTableName} WHERE name = 'test_data'`
-    ) as TableRow[];
-    assert(queryResult.length > 0);
-    assert.strictEqual(queryResult[0].name, 'test_data');
-    console.log('✓ Data queried successfully');
+    itAsync("should create table", async () => {
+      const createTableSQL = `
+        CREATE TABLE IF NOT EXISTS ${testTableName} (
+          id INT PRIMARY KEY AUTO_INCREMENT,
+          name VARCHAR(255),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      const createResult = await connector.execute(createTableSQL);
+      assert(Array.isArray(createResult));
+    });
     
-    // Test 8: Transaction with multiple statements
-    console.log('## Test 8: Transaction with multiple statements');
-    const txResult = await connector.execute([
-      `INSERT INTO ${testTableName} (name) VALUES ('tx1')`,
-      `INSERT INTO ${testTableName} (name) VALUES ('tx2')`,
-      `UPDATE ${testTableName} SET name = CONCAT(name, '_updated') WHERE name LIKE 'tx%'`
-    ]);
-    assert.strictEqual(txResult.length, 3);
-    assert.strictEqual(txResult[0].affectedRows, 1);
-    assert.strictEqual(txResult[1].affectedRows, 1);
-    assert.strictEqual(txResult[2].affectedRows, 2);
-    console.log('✓ Transaction executed successfully');
+    itAsync("should insert data", async () => {
+      const insertResult = await connector.execute(
+        `INSERT INTO ${testTableName} (name) VALUES ('test_data')`
+      );
+      assert.strictEqual(insertResult[0].affectedRows, 1);
+    });
     
-    // Test 9: Serverless detection
-    console.log('## Test 9: Serverless detection');
-    const isServerless: boolean = connector.isServerless;
-    console.log(`✓ Is serverless: ${isServerless}`);
-    if (isServerless) {
-      assert(currentUser.includes('.'));
-      console.log('✓ Serverless user format validated');
-    }
+    itAsync("should query data", async () => {
+      const queryResult = await connector.query(
+        `SELECT * FROM ${testTableName} WHERE name = 'test_data'`
+      ) as TableRow[];
+      assert(queryResult.length > 0);
+      assert.strictEqual(queryResult[0].name, "test_data");
+    });
     
-    // Test 10: Cleanup
-    console.log('## Test 10: Cleanup');
-    await connector.execute(`DROP TABLE IF EXISTS ${testTableName}`);
-    console.log('✓ Test table cleaned up');
+    itAsync("should execute transaction with multiple statements", async () => {
+      const txResult = await connector.execute([
+        `INSERT INTO ${testTableName} (name) VALUES ('tx1')`,
+        `INSERT INTO ${testTableName} (name) VALUES ('tx2')`,
+        `UPDATE ${testTableName} SET name = CONCAT(name, '_updated') WHERE name LIKE 'tx%'`
+      ]);
+      assert.strictEqual(txResult.length, 3);
+      assert.strictEqual(txResult[0].affectedRows, 1);
+      assert.strictEqual(txResult[1].affectedRows, 1);
+      assert.strictEqual(txResult[2].affectedRows, 2);
+    });
     
-    console.log('\n## All tests passed! ✓');
+    itAsync("should detect serverless and validate user format", async () => {
+      const isServerless = connector.isServerless;
+      const currentUser = await connector.currentUsername();
+      
+      if (isServerless) {
+        assert(currentUser.includes("."));
+      }
+    });
     
-  } catch (error) {
-    console.error(`\n✗ Test failed: ${error instanceof Error ? error.message : String(error)}`);
-    if (error instanceof Error && error.stack) {
-      console.error(error.stack);
-    }
-    process.exit(1);
-  } finally {
-    await connector.close();
-  }
+    itAsync("should cleanup test table", async () => {
+      try {
+        await connector.execute(`DROP TABLE IF EXISTS ${testTableName}`);
+      } finally {
+        await connector.close();
+      }
+    });
+  });
 }
 
-runBasicOperationsTest().catch(console.error);
+// Run the tests
+runBasicOperationsTests().catch(error => {
+  console.error("Test execution failed:", error);
+  process.exit(1);
+});
