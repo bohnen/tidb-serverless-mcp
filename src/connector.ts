@@ -36,7 +36,7 @@ export class TiDBConnector {
         try {
           sslConfig.ca = readFileSync(config.tlsCaPath);
         } catch (error) {
-          throw new Error(`Failed to read CA certificate file at path "${config.tlsCaPath}": ${error.message}`);
+          throw new Error(`Failed to read CA certificate file at path "${config.tlsCaPath}": ${error instanceof Error ? error.message : String(error)}`);
         }
       }
       
