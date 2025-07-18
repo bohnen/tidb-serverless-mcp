@@ -92,7 +92,8 @@
       "title": "Password",
       "description": "TiDB password",
       "sensitive": true,
-      "required": false
+      "required": false,
+      "default": ""
     },
     "database": {
       "type": "string",
@@ -112,7 +113,8 @@
       "type": "file",
       "title": "TLS CA Certificate Path",
       "description": "Path to custom CA certificate file for TLS connection",
-      "required": false
+      "required": false,
+      "default": ""
     }
   },
   "compatibility": {

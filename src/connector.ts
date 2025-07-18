@@ -53,11 +53,10 @@ export class TiDBConnector {
     }
 
     const { host, port, username, password, database } = config;
-    return mysql.createPool({
+    const poolConfig: mysql.PoolOptions = {
       host,
       port,
       user: username,
-      password,
       database,
       waitForConnections: true,
       connectionLimit: 10,
@@ -66,7 +65,14 @@ export class TiDBConnector {
       keepAliveInitialDelay: 0,
       ssl: getSslConfig(),
       connectTimeout: 30000,
-    });
+    };
+    
+    // Set password - treat empty strings as passwordless connections
+    if (password !== undefined && password !== '') {
+      poolConfig.password = password;
+    }
+    
+    return mysql.createPool(poolConfig);
   }
 
   async showDatabases(): Promise<any[]> {
@@ -83,7 +89,7 @@ export class TiDBConnector {
       ...this.config,
       database: dbName,
       username: username || this.config.username,
-      password: password || this.config.password,
+      password: password !== undefined ? password : this.config.password,
     };
     this.pool = this.createPool(newConfig);
     this.config = newConfig;

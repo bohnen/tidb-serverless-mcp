@@ -255,7 +255,7 @@ async function main() {
       host: process.env.TIDB_HOST || "gateway01.us-west-2.prod.aws.tidbcloud.com",
       port: parseInt(process.env.TIDB_PORT || "4000"),
       username: process.env.TIDB_USERNAME || "root",
-      password: process.env.TIDB_PASSWORD || "",
+      password: process.env.TIDB_PASSWORD, // Don't default to empty string
       database: process.env.TIDB_DATABASE || "test",
       tls: process.env.TIDB_TLS ? process.env.TIDB_TLS.toLowerCase() === "true" : true,
       tlsCaPath: process.env.TIDB_TLS_CA_CERT_PATH || undefined,

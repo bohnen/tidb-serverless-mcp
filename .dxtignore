@@ -1,0 +1,11 @@
+src/
+mcp.json.example
+.devcontainer/
+ca.pem
+CLAUDE.md
+README.md
+test-e2e/
+test/
+tsconfig.*
+instruction.md
+.claude/
