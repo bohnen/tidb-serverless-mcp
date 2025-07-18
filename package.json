@@ -1,14 +1,19 @@
 {
-  "name": "dxt-tidb",
-  "version": "1.0.0",
-  "description": "DXT extension for TiDB Cloud Serverless - MCP server for database operations",
+  "name": "tidb-unofficial-mcp",
+  "version": "0.2.0",
+  "description": "DXT extension for TiDB / TiDB Cloud - MCP server for database operations",
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "build:test": "tsc --project tsconfig.test.json",
     "dev": "tsc --watch",
     "start": "node dist/server.js",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "npm run build:test && node dist/test/basic-operations.test.js && node dist/test/connector.test.js && node dist/test/server-integration.test.js",
+    "test:basic": "npm run build:test && node dist/test/basic-operations.test.js",
+    "test:connector": "npm run build:test && node dist/test/connector.test.js",
+    "test:server": "npm run build:test && node dist/test/server-integration.test.js"
   },
   "keywords": [
     "tidb",
@@ -21,11 +26,12 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.7.0",
-    "@tidbcloud/serverless": "^0.2.0",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.11.5"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
+    "tsx": "^4.20.3",
     "typescript": "^5.7.2"
   }
 }

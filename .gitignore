@@ -2,6 +2,11 @@ node_modules/
 dist/
 .env
 .env.local
+.env.tidb*
 *.log
 *.dxt
 .DS_Store
+.claude/
+.mcp.json
+ca.pem
+reviews/
