@@ -9,3 +9,4 @@ dist/
 .claude/
 .mcp.json
 ca.pem
+reviews/

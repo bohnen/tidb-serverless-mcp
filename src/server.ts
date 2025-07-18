@@ -9,6 +9,34 @@ import {
 import * as dotenv from "dotenv";
 import { TiDBConfig, TiDBConnector } from "./connector.js";
 
+// Type definitions for better type safety
+interface ToolArgs {
+  [key: string]: any;
+}
+
+interface SwitchDatabaseArgs extends ToolArgs {
+  db_name: string;
+  username?: string;
+  password?: string;
+}
+
+interface QueryArgs extends ToolArgs {
+  sql_stmt: string;
+}
+
+interface ExecuteArgs extends ToolArgs {
+  sql_stmts: string | string[];
+}
+
+interface CreateUserArgs extends ToolArgs {
+  username: string;
+  password: string;
+}
+
+interface RemoveUserArgs extends ToolArgs {
+  username: string;
+}
+
 dotenv.config();
 
 let tidbConnector: TiDBConnector | null = null;
@@ -133,6 +161,39 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   ],
 }));
 
+/**
+ * Validates and sanitizes user input arguments
+ */
+function validateToolArgs<T extends ToolArgs>(args: any, requiredFields: string[]): T {
+  if (!args || typeof args !== 'object') {
+    throw new McpError(ErrorCode.InvalidParams, 'Invalid arguments provided');
+  }
+
+  for (const field of requiredFields) {
+    if (!(field in args) || args[field] === undefined || args[field] === null) {
+      throw new McpError(ErrorCode.InvalidParams, `Missing required field: ${field}`);
+    }
+  }
+
+  return args as T;
+}
+
+/**
+ * Sanitizes error messages to prevent information disclosure
+ */
+function sanitizeError(error: any): string {
+  // Remove sensitive information from error messages
+  const message = error.message || 'Unknown error occurred';
+  
+  // Remove connection details, file paths, and other sensitive info
+  return message
+    .replace(/host=[^,\s]+/gi, 'host=***')
+    .replace(/password=[^,\s]+/gi, 'password=***')
+    .replace(/user=[^,\s]+/gi, 'user=***')
+    .replace(/\/[^\s]+\//g, '/***/')
+    .substring(0, 200); // Limit error message length
+}
+
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (!tidbConnector) {
     throw new McpError(
@@ -158,7 +219,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "switch_database": {
-        const { db_name, username, password } = args as any;
+        const validatedArgs = validateToolArgs<SwitchDatabaseArgs>(args, ['db_name']);
+        const { db_name, username, password } = validatedArgs;
         await tidbConnector.switchDatabase(db_name, username, password);
         return {
           content: [
@@ -183,7 +245,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "db_query": {
-        const { sql_stmt } = args as any;
+        const validatedArgs = validateToolArgs<QueryArgs>(args, ['sql_stmt']);
+        const { sql_stmt } = validatedArgs;
         const result = await tidbConnector.query(sql_stmt);
         return {
           content: [
@@ -196,7 +259,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "db_execute": {
-        const { sql_stmts } = args as any;
+        const validatedArgs = validateToolArgs<ExecuteArgs>(args, ['sql_stmts']);
+        const { sql_stmts } = validatedArgs;
         const results = await tidbConnector.execute(sql_stmts);
         return {
           content: [
@@ -209,7 +273,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "db_create_user": {
-        const { username, password } = args as any;
+        const validatedArgs = validateToolArgs<CreateUserArgs>(args, ['username', 'password']);
+        const { username, password } = validatedArgs;
         const fullUsername = await tidbConnector.createUser(username, password);
         return {
           content: [
@@ -222,7 +287,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "db_remove_user": {
-        const { username } = args as any;
+        const validatedArgs = validateToolArgs<RemoveUserArgs>(args, ['username']);
+        const { username } = validatedArgs;
         await tidbConnector.removeUser(username);
         return {
           content: [
@@ -239,12 +305,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
   } catch (error: any) {
     console.error(`Error executing tool ${name}:`, error);
+    const sanitizedMessage = sanitizeError(error);
     throw new McpError(
       ErrorCode.InternalError,
-      `Failed to execute ${name}: ${error.message}`
+      `Failed to execute ${name}: ${sanitizedMessage}`
     );
   }
 });
+
+/**
+ * Validates TiDB configuration
+ */
+function validateConfig(config: TiDBConfig): void {
+  if (!config.databaseUrl && !config.host) {
+    throw new Error('Either DATABASE_URL or HOST must be provided');
+  }
+  
+  if (!config.databaseUrl && !config.username) {
+    throw new Error('USERNAME is required when not using DATABASE_URL');
+  }
+  
+  if (config.port && (config.port < 1 || config.port > 65535)) {
+    throw new Error('Invalid port number');
+  }
+}
 
 async function main() {
   try {
@@ -260,6 +344,9 @@ async function main() {
       tls: process.env.TIDB_TLS ? process.env.TIDB_TLS.toLowerCase() === "true" : true,
       tlsCaPath: process.env.TIDB_TLS_CA_CERT_PATH || undefined,
     };
+
+    // Validate configuration before proceeding
+    validateConfig(config);
 
     tidbConnector = new TiDBConnector(config);
     console.error(`Connected to TiDB: ${config.host}:${config.port}/${config.database}`);

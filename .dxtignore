@@ -9,3 +9,4 @@ test/
 tsconfig.*
 instruction.md
 .claude/
+reviews/

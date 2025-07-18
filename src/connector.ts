@@ -1,5 +1,5 @@
-import mysql from "mysql2/promise";
 import { readFileSync } from 'fs';
+import mysql from "mysql2/promise";
 
 export interface TiDBConfig {
   databaseUrl?: string;
@@ -105,8 +105,19 @@ export class TiDBConnector {
     return (rows as any[]).map((row: any) => Object.values(row)[0] as string);
   }
 
-  async query(sqlStmt: string): Promise<any[]> {
-    const [rows] = await this.pool.execute(sqlStmt);
+  async query(sqlStmt: string, params?: any[]): Promise<any[]> {
+    // Validate that the SQL statement is a read-only operation
+    const trimmedSql = sqlStmt.trim().toLowerCase();
+    const readOnlyKeywords = ['select', 'show', 'describe', 'explain', 'with'];
+    const isReadOnly = readOnlyKeywords.some(keyword => trimmedSql.startsWith(keyword));
+    
+    if (!isReadOnly) {
+      throw new Error('Query method only supports read-only operations. Use execute() for modifications.');
+    }
+    
+    const [rows] = params ? 
+      await this.pool.execute(sqlStmt, params) : 
+      await this.pool.execute(sqlStmt);
     return rows as any[];
   }
 
@@ -149,7 +160,12 @@ export class TiDBConnector {
   }
 
   async createUser(username: string, password: string): Promise<string> {
-    let fullUsername = username;
+    // Input validation
+    if (!username || username.trim().length === 0) {
+      throw new Error('Username cannot be empty');
+    }
+    
+    let fullUsername = username.trim();
     
     if (this.isServerless && !username.includes(".")) {
       const currentUser = await this.currentUsername();
@@ -157,12 +173,25 @@ export class TiDBConnector {
       fullUsername = `${prefix}.${username}`;
     }
 
-    await this.pool.execute(`CREATE USER '${fullUsername}' IDENTIFIED BY '${password}'`);
+    // Use mysql2's value escaping for security (DDL doesn't support parameterized queries)
+    const connection = await this.pool.getConnection();
+    try {
+      const escapedUsername = connection.escape(fullUsername);
+      const escapedPassword = connection.escape(password);
+      await connection.execute(`CREATE USER ${escapedUsername} IDENTIFIED BY ${escapedPassword}`);
+    } finally {
+      connection.release();
+    }
     return fullUsername;
   }
 
   async removeUser(username: string): Promise<void> {
-    let fullUsername = username;
+    // Input validation
+    if (!username || username.trim().length === 0) {
+      throw new Error('Username cannot be empty');
+    }
+    
+    let fullUsername = username.trim();
     
     if (this.isServerless && !username.includes(".")) {
       const currentUser = await this.currentUsername();
@@ -170,7 +199,14 @@ export class TiDBConnector {
       fullUsername = `${prefix}.${username}`;
     }
 
-    await this.pool.execute(`DROP USER '${fullUsername}'`);
+    // Use mysql2's value escaping for security (DDL doesn't support parameterized queries)
+    const connection = await this.pool.getConnection();
+    try {
+      const escapedUsername = connection.escape(fullUsername);
+      await connection.execute(`DROP USER ${escapedUsername}`);
+    } finally {
+      connection.release();
+    }
   }
 
   async close(): Promise<void> {
