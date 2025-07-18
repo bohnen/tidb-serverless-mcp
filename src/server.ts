@@ -1,13 +1,13 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
-  ListToolsRequestSchema,
   CallToolRequestSchema,
   ErrorCode,
+  ListToolsRequestSchema,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import * as dotenv from "dotenv";
-import { TiDBConnector, TiDBConfig } from "./connector.js";
+import { TiDBConfig, TiDBConnector } from "./connector.js";
 
 dotenv.config();
 
@@ -15,8 +15,8 @@ let tidbConnector: TiDBConnector | null = null;
 
 const server = new Server(
   {
-    name: "tidb-cloud-serverless",
-    version: "1.0.0",
+    name: "tidb-unofficial-mcp",
+    version: "0.2.0",
   },
   {
     capabilities: {

@@ -1,4 +1,5 @@
 import mysql from "mysql2/promise";
+import { readFileSync } from 'fs';
 
 export interface TiDBConfig {
   databaseUrl?: string;
@@ -32,8 +33,7 @@ export class TiDBConnector {
       };
       
       if (config.tlsCaPath) {
-        const fs = require('fs');
-        sslConfig.ca = fs.readFileSync(config.tlsCaPath);
+        sslConfig.ca = readFileSync(config.tlsCaPath);
       }
       
       return sslConfig;
