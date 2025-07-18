@@ -33,7 +33,11 @@ export class TiDBConnector {
       };
       
       if (config.tlsCaPath) {
-        sslConfig.ca = readFileSync(config.tlsCaPath);
+        try {
+          sslConfig.ca = readFileSync(config.tlsCaPath);
+        } catch (error) {
+          throw new Error(`Failed to read CA certificate file at path "${config.tlsCaPath}": ${error.message}`);
+        }
       }
       
       return sslConfig;
