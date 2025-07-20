@@ -9,11 +9,14 @@
     "build:test": "tsc --project tsconfig.test.json",
     "dev": "tsc --watch",
     "start": "node dist/server.js",
+    "start:http": "node dist/server-http.js",
+    "dev:http": "MCP_HTTP_PORT=3000 node dist/server-http.js",
     "clean": "rm -rf dist",
-    "test": "npm run build:test && node dist/test/basic-operations.test.js && node dist/test/connector.test.js && node dist/test/server-integration.test.js",
+    "test": "npm run build:test && node dist/test/basic-operations.test.js && node dist/test/connector.test.js && node dist/test/server-integration.test.js && node dist/test/server-http.test.js",
     "test:basic": "npm run build:test && node dist/test/basic-operations.test.js",
     "test:connector": "npm run build:test && node dist/test/connector.test.js",
-    "test:server": "npm run build:test && node dist/test/server-integration.test.js"
+    "test:server": "npm run build:test && node dist/test/server-integration.test.js",
+    "test:http": "npm run build:test && node dist/test/server-http.test.js"
   },
   "keywords": [
     "tidb",
@@ -25,11 +28,16 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.7.0",
+    "@modelcontextprotocol/sdk": "^1.16.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "mysql2": "^3.11.5"
+    "express": "^5.1.0",
+    "mysql2": "^3.11.5",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
     "@types/node": "^22.10.5",
     "tsx": "^4.20.3",
     "typescript": "^5.7.2"

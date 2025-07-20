@@ -2,6 +2,8 @@
 
 A Desktop Extension (DXT) that provides a Model Context Protocol (MCP) server for TiDB Cloud Serverless database operations. This extension enables AI assistants to interact with TiDB Cloud Serverless databases through a comprehensive set of database management tools.
 
+The MCP server supports both **stdio** (default) and **Streamable HTTP** transports, making it compatible with various MCP clients and integration scenarios.
+
 ## Features
 
 - **Database Management**: List databases, switch between databases
@@ -42,6 +44,10 @@ TIDB_PORT=4000
 TIDB_USERNAME=your_username
 TIDB_PASSWORD=your_password
 TIDB_DATABASE=test
+
+# HTTP Server Configuration (optional)
+MCP_HTTP_PORT=3000              # HTTP server port (default: 3000)
+MCP_CORS_ORIGIN=*               # CORS origin (default: *)
 ```
 
 ### DXT User Configuration
@@ -135,13 +141,48 @@ npm run build
 npm run dev  # Watch mode for development
 ```
 
+### Running the Server
+
+The MCP server can be run in two modes:
+
+#### 1. Stdio Mode (Default)
+```bash
+npm start
+```
+This mode is used by MCP Studio and other stdio-based clients.
+
+#### 2. Streamable HTTP Mode
+```bash
+npm run start:http
+```
+Or with custom port:
+```bash
+MCP_HTTP_PORT=8080 npm run start:http
+```
+
+The Streamable HTTP server provides a stateful session-based communication protocol:
+- Main endpoint: `http://localhost:{port}/mcp`
+- Supports POST for client-to-server requests
+- Supports GET for server-to-client notifications (Server-Sent Events)
+- Supports DELETE for session termination
+- Session management via `mcp-session-id` header
+
 ### Testing
 To test the extension locally:
 
 1. Build the extension: `npm run build`
 2. Set up your `.env` file with valid TiDB credentials
-3. Run the server: `npm start`
-4. The server will communicate via stdio transport
+3. Run the server in your preferred mode (stdio or HTTP)
+4. Run tests: `npm test`
+
+#### Available Test Commands
+```bash
+npm test              # Run all tests
+npm run test:basic    # Run basic operations tests
+npm run test:connector # Run connector tests
+npm run test:server   # Run stdio server integration tests
+npm run test:http     # Run HTTP server integration tests
+```
 
 ## Security
 

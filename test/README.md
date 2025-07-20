@@ -40,7 +40,7 @@ TiDBConnector クラスの全機能を詳細にテストします。
 
 ### `server-integration.test.ts`
 
-MCP サーバーの統合テストを実行します。
+MCP サーバーの統合テストを実行します（stdio トランスポート）。
 
 **テスト観点:**
 
@@ -49,6 +49,20 @@ MCP サーバーの統合テストを実行します。
 - **エラーハンドリング**: ツールレベルでのエラー処理
 - **データ整合性**: ツール間でのデータ一貫性
 - **JSON 形式**: 結果の JSON シリアライゼーション
+
+### `server-http.test.ts`
+
+MCP サーバーの Streamable HTTP トランスポート統合テストを実行します。
+
+**テスト観点:**
+
+- **HTTP サーバー起動**: ランダムポートでの起動確認
+- **Streamable HTTP 接続**: StreamableHTTPClientTransport による接続確立
+- **セッション管理**: mcp-session-id ヘッダーによるセッション維持
+- **リクエスト/レスポンス**: POST/GET/DELETE メソッドのサポート
+- **全ツールの動作**: stdio モードと同等の機能確認
+- **エラーハンドリング**: HTTP レスポンスコードの検証
+- **Server-Sent Events**: サーバーからクライアントへの通知機能
 
 ## テスト実行方法
 
@@ -64,6 +78,10 @@ TIDB_PORT=4000
 TIDB_USERNAME=your_username
 TIDB_PASSWORD=your_password
 TIDB_DATABASE=test
+
+# HTTPテスト用の環境変数（オプション）
+MCP_HTTP_PORT=3000              # テスト用HTTPポート
+MCP_CORS_ORIGIN=*               # CORS設定
 ```
 
 ### 実行コマンド
@@ -75,7 +93,8 @@ npm test
 # 個別テストの実行
 npm run test:basic      # 基本操作テスト
 npm run test:connector  # コネクタテスト
-npm run test:server     # サーバー統合テスト
+npm run test:server     # サーバー統合テスト（stdio）
+npm run test:http       # HTTPサーバー統合テスト
 ```
 
 ## テスト設計方針
@@ -129,6 +148,8 @@ npm run test:server     # サーバー統合テスト
 2. **ネットワーク**: TiDB Cloud への接続にはインターネット接続が必要
 3. **権限**: 一部のテスト（ユーザー管理）は権限により実行をスキップする場合がある
 4. **データ**: テストは一時的なテストテーブルを作成・削除するため、既存データには影響しない
+5. **HTTPテスト**: ランダムポートを使用するため、同時実行時の競合を回避
+6. **Streamable HTTP**: HTTPテストでは `@modelcontextprotocol/sdk` の StreamableHTTPClientTransport を使用
 
 ## 拡張方法
 
