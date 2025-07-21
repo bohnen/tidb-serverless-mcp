@@ -172,7 +172,7 @@ async function main() {
     const tidbConnector = new TiDBConnector(config);
     console.error(`Connected to TiDB: ${config.host}:${config.port}/${config.database}`);
 
-    const port = parseInt(process.env.MCP_HTTP_PORT || "3000");
+    const port = parseInt(process.env.MCP_HTTP_PORT || DEFAULT_HTTP_PORT.toString());
     const app = express();
     
     // Configure CORS
