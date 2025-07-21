@@ -11,6 +11,8 @@ import { validateConfig, getDefaultConfig } from "./server-common.js";
 
 dotenv.config();
 
+const DEFAULT_HTTP_PORT = 3000;
+
 function createMcpServer(): McpServer {
   return new McpServer({
     name: "tidb-unofficial-mcp",

@@ -24,7 +24,7 @@ async function delay(ms: number): Promise<void> {
 }
 
 async function startHttpServer(): Promise<ChildProcess> {
-  const server = spawn("node", ["dist/server-http.js"], {
+  const server = spawn("node", ["dist/src/server-http.js"], {
     env: {
       ...process.env,
       ...config,
