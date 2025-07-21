@@ -15,7 +15,8 @@ const config = {
   TIDB_TLS: process.env.TIDB_TLS || "true",
 };
 
-const HTTP_PORT = 3457 + Math.floor(Math.random() * 1000);
+const BASE_HTTP_PORT = 3457; // Base port for HTTP server, chosen to avoid conflicts with common reserved ports.
+const HTTP_PORT = BASE_HTTP_PORT + Math.floor(Math.random() * 1000);
 const SERVER_URL = `http://localhost:${HTTP_PORT}`;
 
 async function delay(ms: number): Promise<void> {
