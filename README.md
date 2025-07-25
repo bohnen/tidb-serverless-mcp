@@ -1,6 +1,6 @@
-# TiDB Cloud Serverless DXT Extension
+# TiDB Unofficial DXT / MCP Server
 
-A Desktop Extension (DXT) that provides a Model Context Protocol (MCP) server for TiDB Cloud Serverless database operations. This extension enables AI assistants to interact with TiDB Cloud Serverless databases through a comprehensive set of database management tools.
+A Desktop Extension (DXT) that provides a Model Context Protocol (MCP) server for TiDB database operations. This extension enables AI assistants to interact with TiDB databases through a comprehensive set of database management tools.
 
 The MCP server supports both **stdio** (default) and **Streamable HTTP** transports, making it compatible with various MCP clients and integration scenarios.
 
@@ -83,7 +83,7 @@ Executes INSERT, UPDATE, DELETE, CREATE, DROP operations. Can handle single stat
 - `sql_stmts` (required): SQL statement(s) to execute (string or array)
 
 ### `db_create_user`
-Creates a new database user. Returns the username with prefix for TiDB Serverless.
+Creates a new database user.
 - `username` (required): The username for the new user
 - `password` (required): The password for the new user
 
@@ -188,12 +188,12 @@ npm run test:http     # Run HTTP server integration tests
 
 - Always use environment variables or secure configuration for database credentials
 - The extension supports parameterized queries to prevent SQL injection
-- User management operations are restricted to the current user's prefix in TiDB Serverless
+- User management operations are restricted to the current user's role in TiDB 
 
 ## Troubleshooting
 
 ### Connection Issues
-- Verify your TiDB Cloud Serverless credentials
+- Verify your TiDB credentials
 - Check that your database URL format is correct
 - Ensure your IP is whitelisted in TiDB Cloud Console
 
